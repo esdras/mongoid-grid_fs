@@ -51,6 +51,7 @@
 
       require "digest/md5"
       require "cgi"
+      require 'bson'
     end
   end
 
@@ -214,14 +215,8 @@
             raise
           end
 
-          if defined?(Moped)
-            def binary_for(*buf)
-              Moped::BSON::Binary.new(:generic, buf.join)
-            end
-          else
-            def binary_for(buf)
-              BSON::Binary.new(buf.bytes.to_a)
-            end
+          def binary_for(buf)
+            BSON::Binary.new(buf.bytes.to_a)
           end
 
           def get(id)
@@ -449,7 +444,7 @@
           self.default_collection_name = "#{ prefix }.chunks"
 
           field(:n, :type => Integer, :default => 0)
-          field(:data, :type => (defined?(Moped) ? Moped::BSON::Binary : BSON::Binary))
+          field(:data, :type => BSON::Binary)
 
           belongs_to(:file, :foreign_key => :files_id, :class_name => file_model_name)
 
